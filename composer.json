@@ -1,0 +1,22 @@
+{
+    "name": "xeki-tech/html-twig",
+    "type": "library",
+    "description": "Handing twig in xeki framework",
+    "keywords": ["templating"],
+    "homepage": "https://xeki.tech/html-twig",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Xeki Team",
+            "role": "Contributors"
+        },
+        {
+            "name": "Luis Patt",
+            "role": "Project Founder"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "twig/twig": "^3.3"
+    }  
+}
