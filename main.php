@@ -31,7 +31,7 @@ class main
             $path_cache = \xeki\core::$SYSTEM_PATH_BASE.'/'.$this->config['cache_folder'];## this update by modules
             $this->config['pages_folder']=$path_html;
             $this->config['cache_folder']=$path_cache;
-            self::$sql = new xeki_html_twig( $this->config);
+            self::$sql = new html_twig( $this->config);
         }
         return self::$sql;
     }
