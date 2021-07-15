@@ -1,35 +1,98 @@
 <?php
 
-namespace xeki_html_twig;
+namespace xeki_modules\html_twig;
+
 use Twig;
-class xeki_html_twig
+
+/**
+ * Class html_twig
+ * @package xeki_modules\html_twig
+ */
+class html_twig
 {
 
+    /**
+     * @var bool
+     */
     public $done_render = false;
+    /**
+     * @var string|Twig\Environment
+     */
     public $render = '';
+    /**
+     * @var string
+     */
     public $AG_BASE = '';
 
+    /**
+     * @var string
+     */
     public $AG_BASE_COMPLETE = '';
+    /**
+     * @var string
+     */
     public $ARRAY_PARAMS = '';
+    /**
+     * @var string
+     */
     public $LAST_PARAM = '';
 
 
+    /**
+     * @var array
+     */
     public $AG_PARAMS = array();
+    /**
+     * @var string
+     */
     public $AG_L_PARAM = '';
 
+    /**
+     * @var array
+     */
     public $AG_SEO_DATA = array();
+    /**
+     * @var array
+     */
     public $SOCIAL_META_TAGS = array();
+    /**
+     * @var string
+     */
     public $ITEMSCOPE = "";
 
+    /**
+     * @var string
+     */
     public $AG_META_DATA = "";
+    /**
+     * @var array
+     */
     public $AG_RENDER_EXTRA_DATA = array();
 
+    /**
+     * @var string
+     */
     public $SOCIAL_META_TAGS_HTML = "";
 
+    /**
+     * @var array|mixed
+     */
     protected static $base_path = array();
+    /**
+     * @var mixed
+     */
     private $DEFAULT_TITLE;
+    /**
+     * @var mixed
+     */
     private $DEFAULT_END_TITLE;
+    /**
+     * @var mixed
+     */
     private $DEFAULT_DESCRIPTION;
+    /**
+     * @var mixed
+     */
     private $DEFAULT_END_DESCRIPTION;
 
     /**
@@ -40,48 +103,56 @@ class xeki_html_twig
 
         $this->analyze_url();
 
-        if(!empty($config['static_files_url'])){
+        if (!empty($config['static_files_url'])) {
             $this->load_static_files($config['static_files_url']);
         }
-        $this->DEFAULT_TITLE=$config['default_title'];
-        $this->DEFAULT_END_TITLE=$config['default_end_title'];
-        $this->DEFAULT_DESCRIPTION=$config['default_description'];
-        $this->DEFAULT_END_DESCRIPTION=$config['default_end_description'];
+        $this->DEFAULT_TITLE = $config['default_title'];
+        $this->DEFAULT_END_TITLE = $config['default_end_title'];
+        $this->DEFAULT_DESCRIPTION = $config['default_description'];
+        $this->DEFAULT_END_DESCRIPTION = $config['default_end_description'];
 
         $this->base_path = $config['pages_folder'];
         $loader = new Twig\Loader\FilesystemLoader($this->base_path);#folder html
 
         $cache_folder = $config['cache_folder'];
         // Check if is in gcp / GAE
-        if(isset($_SERVER['GAE_INSTANCE'])){
+        if (isset($_SERVER['GAE_INSTANCE'])) {
             $cache_folder = '/tmp/twig/';
-            $config['cache']=false;
+            $config['cache'] = false;
         }
         $this->render = new Twig\Environment($loader, array(
-            'cache' => $cache_folder , #folder cache
+            'cache' => $cache_folder, #folder cache
             'debug' => $config['cache'],
             'charset' => 'utf-8',
         ));
-        
+
 
     }
 
-    private function load_static_files($url_param){
-        $url_static_files='';
-
-        if(strpos($url_param, "http")!==false){
-            $url_static_files=$url_param;
-        }
-        else{
-            $url_static_files=\xeki\core::$URL_BASE_COMPLETE.$url_param;
-        }
-
-        $this->SetVar("static_files",$url_static_files);
-        $this->SetVar("static_files_url",$url_static_files);
-    }
-    public function set_path($path,$cache="")
+    /**
+     * @param $url_param
+     */
+    private function load_static_files($url_param)
     {
-        if($cache=="")$cache=\xeki\core::$SYSTEM_PATH_BASE."/cache/";
+        $url_static_files = '';
+
+        if (strpos($url_param, "http") !== false) {
+            $url_static_files = $url_param;
+        } else {
+            $url_static_files = \xeki\core::$URL_BASE_COMPLETE . $url_param;
+        }
+
+        $this->SetVar("static_files", $url_static_files);
+        $this->SetVar("static_files_url", $url_static_files);
+    }
+
+    /**
+     * @param $path
+     * @param string $cache
+     */
+    public function set_path($path, $cache = "")
+    {
+        if ($cache == "") $cache = \xeki\core::$SYSTEM_PATH_BASE . "/cache/";
 //        d("new render");
         $_DEBUG_MODE = DEBUG_MODE;
         $this->base_path = $path;
@@ -99,6 +170,9 @@ class xeki_html_twig
      * Analyze and load AG_BASE and AG_BASE_COMPLETE
      */
     // this will be deprecated
+    /**
+     *
+     */
     public function analyze_url()
     {
         $AG_BASE = \xeki\core::$URL_BASE;
@@ -117,39 +191,60 @@ class xeki_html_twig
         $this->LAST_PARAM = $AG_L_PARAM;
     }
 
+    /**
+     * @param string $data
+     * @param string $key
+     */
     public function set_render_data($data = "", $key = "")
     {
         $this->AG_SEO_DATA[$data] = $key;
     }
 
+    /**
+     * @param string $meta_data
+     */
     public function set_meta_data($meta_data = "")
     {
         $this->AG_META_DATA;
     }
 
 
+    /**
+     * @param $key_array
+     * @param string $value
+     */
     public function SetVar($key_array, $value = "")
     {
         if (is_array($key_array)) {
             $this->AG_RENDER_EXTRA_DATA = array_merge($this->AG_RENDER_EXTRA_DATA, $key_array);
         } else {
-            $this->AG_RENDER_EXTRA_DATA[$key_array]=$value;
+            $this->AG_RENDER_EXTRA_DATA[$key_array] = $value;
         }
     }
 
+    /**
+     * @param $key_array
+     * @return mixed
+     */
     public function GetVar($key_array)
     {
         return $this->AG_RENDER_EXTRA_DATA[$key_array];
     }
 
+    /**
+     * @return array
+     */
     public function GetVars()
     {
         return $this->AG_RENDER_EXTRA_DATA;
     }
 
-    public function set_itemscope($itemscope="")
+    /**
+     * @param string $itemscope
+     */
+    public function set_itemscope($itemscope = "")
     {
-        $this->ITEMSCOPE= $itemscope;
+        $this->ITEMSCOPE = $itemscope;
     }
 
     /**
@@ -190,91 +285,92 @@ class xeki_html_twig
      * @param string $keywords
      * @param bool|false $fixInfo
      */
-    public function set_social_meta_tags($data=array())
+    public function set_social_meta_tags($data = array())
     {
         $this->SOCIAL_META_TAGS = array();
-        foreach ($this->SOCIAL_META_TAGS as $item){
+        foreach ($this->SOCIAL_META_TAGS as $item) {
 
         }
-        $this->SOCIAL_META_TAGS_HTML= "";
+        $this->SOCIAL_META_TAGS_HTML = "";
 
-        if(isset($data['google'])){
+        if (isset($data['google'])) {
             $inner_data = $data['google'];
-            if($inner_data['name'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta itemprop='name' content='{$inner_data['name']}'>";
+            if ($inner_data['name']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta itemprop='name' content='{$inner_data['name']}'>";
             }
-            if($inner_data['description'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta itemprop='description' content='{$inner_data['description']}'>";
+            if ($inner_data['description']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta itemprop='description' content='{$inner_data['description']}'>";
             }
-            if($inner_data['image'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta itemprop='image' content='{$inner_data['image']}'>";
+            if ($inner_data['image']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta itemprop='image' content='{$inner_data['image']}'>";
             }
         }
 
-        if(isset($data['twitter'])){
+        if (isset($data['twitter'])) {
             $inner_data = $data['twitter'];
-            if($inner_data['card'] ){
+            if ($inner_data['card']) {
 //                $this->>SOCIAL_META_TAGS_HTML.= "<meta name='twitter:card' content='summary_large_image'>";
             }
-            if($inner_data['site'] ){
+            if ($inner_data['site']) {
 //                $this->>SOCIAL_META_TAGS_HTML.= "<meta name='twitter:site' content=''@publisher_handle'>";
             }
-            if($inner_data['title'] ){
+            if ($inner_data['title']) {
 //                $this->>SOCIAL_META_TAGS_HTML.= "<meta name='twitter:title' content='Page Title'>";
             }
-            if($inner_data['description'] ){
+            if ($inner_data['description']) {
 //                $this->>SOCIAL_META_TAGS_HTML.= "<meta name='twitter:description' content='Page description less than 200 characters'>";
             }
-            if($inner_data['creator'] ){
+            if ($inner_data['creator']) {
 //                $this->>SOCIAL_META_TAGS_HTML.= "<meta name='twitter:creator' content=''@author_handle'>";
             }
-            if($inner_data['image'] ){
+            if ($inner_data['image']) {
 //                $this->>SOCIAL_META_TAGS_HTML.= "<meta name='twitter:image:src' content='http://www.example.com/image.jpg'>";
             }
         }
-        if(isset($data['facebook'])){
+        if (isset($data['facebook'])) {
             $inner_data = $data['facebook'];
-            if($inner_data['title'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='og:title' content='{$inner_data['title']}'>";
+            if ($inner_data['title']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='og:title' content='{$inner_data['title']}'>";
             }
-            if($inner_data['type'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='og:type' content='{$inner_data['type']}'>";
+            if ($inner_data['type']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='og:type' content='{$inner_data['type']}'>";
             }
-            if($inner_data['url'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='og:url' content='{$inner_data['url']}'>";
+            if ($inner_data['url']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='og:url' content='{$inner_data['url']}'>";
             }
-            if($inner_data['image'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='og:image' content='{$inner_data['image']}'>";
+            if ($inner_data['image']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='og:image' content='{$inner_data['image']}'>";
             }
-            if($inner_data['description'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='og:description' content='{$inner_data['description']}'>";
+            if ($inner_data['description']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='og:description' content='{$inner_data['description']}'>";
             }
-            if($inner_data['site_name'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='og:site_name' content='{$inner_data['site_name']}'>";
+            if ($inner_data['site_name']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='og:site_name' content='{$inner_data['site_name']}'>";
             }
-            if($inner_data['fb:admins'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='fb:admins' content='{$inner_data['fb:admins']}'>";
+            if ($inner_data['fb:admins']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='fb:admins' content='{$inner_data['fb:admins']}'>";
             }
-            if($inner_data['article:published_time'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='article:published_time' content='{$inner_data['article:published_time']}' />";
+            if ($inner_data['article:published_time']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='article:published_time' content='{$inner_data['article:published_time']}' />";
             }
-            if($inner_data['article:modified_time'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='article:modified_time' content='{$inner_data['article:modified_time']}' />";
+            if ($inner_data['article:modified_time']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='article:modified_time' content='{$inner_data['article:modified_time']}' />";
             }
-            if($inner_data['article:section'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='article:section' content='{$inner_data['article:section']}' />   ";
+            if ($inner_data['article:section']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='article:section' content='{$inner_data['article:section']}' />   ";
             }
-            if($inner_data['article:tag'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='article:tag' content='{$inner_data['article:tag']}' />   ";
+            if ($inner_data['article:tag']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='article:tag' content='{$inner_data['article:tag']}' />   ";
             }
-            if($inner_data['price:amount'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='og:price:amount' content='{$inner_data['price:amount']}' />";
+            if ($inner_data['price:amount']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='og:price:amount' content='{$inner_data['price:amount']}' />";
             }
-            if($inner_data['price:currency'] ){
-                $this->SOCIAL_META_TAGS_HTML.= "<meta property='og:price:currency' content='{$inner_data['price:currency']}' />";
+            if ($inner_data['price:currency']) {
+                $this->SOCIAL_META_TAGS_HTML .= "<meta property='og:price:currency' content='{$inner_data['price:currency']}' />";
             }
         }
     }
+
     /**
      * Set seo
      * @param string $title
@@ -328,19 +424,22 @@ class xeki_html_twig
         $this->AG_SEO_DATA['page_keyWords'] = cleanToPrint($keywords);
     }
 
-    public function render_json($array_json){
-        $this->done_render=true;
+    /**
+     * @param $array_json
+     */
+    public function render_json($array_json)
+    {
+        $this->done_render = true;
         header('Content-Type: application/json');
         utf8_size($array_json);
-        $json='';
-        if(is_array($array_json)){
-            $json=json_encode($array_json);
-        }
-        else{
-            $json=$array_json;
+        $json = '';
+        if (is_array($array_json)) {
+            $json = json_encode($array_json);
+        } else {
+            $json = $array_json;
         }
         // transform to acoutes to ut8
-        echo ($json);
+        echo($json);
     }
 
     /**
@@ -350,8 +449,8 @@ class xeki_html_twig
     public function render($file = '', $dataArray = array())
     {
         // fix
-        if(!is_array($dataArray))$dataArray=array();
-        $this->done_render=true;
+        if (!is_array($dataArray)) $dataArray = array();
+        $this->done_render = true;
         $AG_BASE = $this->AG_BASE;
         $AG_BASE_COMPLETE = $this->AG_BASE_COMPLETE;
         $AG_META_DATA = $this->AG_META_DATA;
@@ -371,17 +470,17 @@ class xeki_html_twig
         $dataArray = array_merge($variables_system, $dataArray);
         $dataArray = array_merge($this->AG_RENDER_EXTRA_DATA, $dataArray);
 
-        if($this->ITEMSCOPE!==""){
-            $dataArray['page_item_scope']=$this->ITEMSCOPE;
+        if ($this->ITEMSCOPE !== "") {
+            $dataArray['page_item_scope'] = $this->ITEMSCOPE;
         }
-        if($this->SOCIAL_META_TAGS_HTML!==""){
-            $dataArray['page_social_meta_tags']=$this->SOCIAL_META_TAGS_HTML;
+        if ($this->SOCIAL_META_TAGS_HTML !== "") {
+            $dataArray['page_social_meta_tags'] = $this->SOCIAL_META_TAGS_HTML;
         }
 
         // Other tags
         // valid if file exist
         $file_base_path = $this->base_path;
-        if(!file_exists ( "{$file_base_path}{$file}")){
+        if (!file_exists("{$file_base_path}{$file}")) {
             // ERROR the html file dont exist
             echo "ERROR the file dont exist {$file_base_path}{$file}";
             die();
@@ -396,6 +495,10 @@ class xeki_html_twig
         echo $print_html;
     }
 
+    /**
+     * @param $output
+     * @return array|string|string[]|null
+     */
     public function compress_html($output)
     {
         return preg_replace(
@@ -407,7 +510,12 @@ class xeki_html_twig
 
 
     // static methods
-    public function get_url_base_complete(){
+
+    /**
+     * @return string
+     */
+    public function get_url_base_complete()
+    {
         return $this->AG_BASE_COMPLETE;
     }
 
