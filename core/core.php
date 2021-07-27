@@ -1,98 +1,32 @@
 <?php
-
-namespace xeki_modules\html_twig;
-
+namespace xeki_html_twig;
 use Twig;
-
-/**
- * Class html_twig
- * @package xeki_modules\html_twig
- */
-class html_twig
+class xeki_html_twig
 {
-
-    /**
-     * @var bool
-     */
     public $done_render = false;
-    /**
-     * @var string|Twig\Environment
-     */
     public $render = '';
-    /**
-     * @var string
-     */
     public $AG_BASE = '';
 
-    /**
-     * @var string
-     */
     public $AG_BASE_COMPLETE = '';
-    /**
-     * @var string
-     */
     public $ARRAY_PARAMS = '';
-    /**
-     * @var string
-     */
     public $LAST_PARAM = '';
 
-
-    /**
-     * @var array
-     */
     public $AG_PARAMS = array();
-    /**
-     * @var string
-     */
     public $AG_L_PARAM = '';
 
-    /**
-     * @var array
-     */
     public $AG_SEO_DATA = array();
-    /**
-     * @var array
-     */
     public $SOCIAL_META_TAGS = array();
-    /**
-     * @var string
-     */
     public $ITEMSCOPE = "";
 
-    /**
-     * @var string
-     */
     public $AG_META_DATA = "";
-    /**
-     * @var array
-     */
     public $AG_RENDER_EXTRA_DATA = array();
 
-    /**
-     * @var string
-     */
     public $SOCIAL_META_TAGS_HTML = "";
 
-    /**
-     * @var array|mixed
-     */
     protected static $base_path = array();
-    /**
-     * @var mixed
-     */
     private $DEFAULT_TITLE;
-    /**
-     * @var mixed
-     */
     private $DEFAULT_END_TITLE;
-    /**
-     * @var mixed
-     */
     private $DEFAULT_DESCRIPTION;
-    /**
-     * @var mixed
-     */
     private $DEFAULT_END_DESCRIPTION;
 
     /**
@@ -100,9 +34,7 @@ class html_twig
      */
     public function __construct($config)
     {
-
         $this->analyze_url();
-
         if (!empty($config['static_files_url'])) {
             $this->load_static_files($config['static_files_url']);
         }
@@ -115,45 +47,33 @@ class html_twig
         $loader = new Twig\Loader\FilesystemLoader($this->base_path);#folder html
 
         $cache_folder = $config['cache_folder'];
-        // Check if is in gcp / GAE
-        if (isset($_SERVER['GAE_INSTANCE'])) {
-            $cache_folder = '/tmp/twig/';
-            $config['cache'] = false;
+
+        // check permissions for production envs
+        if (!is_writeable($cache_folder)) {
+            $cache_folder = sys_get_temp_dir();
         }
         $this->render = new Twig\Environment($loader, array(
             'cache' => $cache_folder, #folder cache
             'debug' => $config['cache'],
             'charset' => 'utf-8',
         ));
-
-
     }
 
-    /**
-     * @param $url_param
-     */
     private function load_static_files($url_param)
     {
         $url_static_files = '';
-
         if (strpos($url_param, "http") !== false) {
             $url_static_files = $url_param;
         } else {
             $url_static_files = \xeki\core::$URL_BASE_COMPLETE . $url_param;
         }
-
         $this->SetVar("static_files", $url_static_files);
         $this->SetVar("static_files_url", $url_static_files);
     }
 
-    /**
-     * @param $path
-     * @param string $cache
-     */
     public function set_path($path, $cache = "")
     {
         if ($cache == "") $cache = \xeki\core::$SYSTEM_PATH_BASE . "/cache/";
-//        d("new render");
         $_DEBUG_MODE = DEBUG_MODE;
         $this->base_path = $path;
         $loader = new Twig\Loader\FilesystemLoader($path);#folder html
@@ -162,16 +82,10 @@ class html_twig
             'debug' => $_DEBUG_MODE,
             'charset' => 'utf-8',
         ));
-
     }
-
 
     /**
      * Analyze and load AG_BASE and AG_BASE_COMPLETE
-     */
-    // this will be deprecated
-    /**
-     *
      */
     public function analyze_url()
     {
@@ -191,28 +105,11 @@ class html_twig
         $this->LAST_PARAM = $AG_L_PARAM;
     }
 
-    /**
-     * @param string $data
-     * @param string $key
-     */
     public function set_render_data($data = "", $key = "")
     {
         $this->AG_SEO_DATA[$data] = $key;
     }
 
-    /**
-     * @param string $meta_data
-     */
-    public function set_meta_data($meta_data = "")
-    {
-        $this->AG_META_DATA;
-    }
-
-
-    /**
-     * @param $key_array
-     * @param string $value
-     */
     public function SetVar($key_array, $value = "")
     {
         if (is_array($key_array)) {
@@ -222,26 +119,16 @@ class html_twig
         }
     }
 
-    /**
-     * @param $key_array
-     * @return mixed
-     */
     public function GetVar($key_array)
     {
         return $this->AG_RENDER_EXTRA_DATA[$key_array];
     }
 
-    /**
-     * @return array
-     */
     public function GetVars()
     {
         return $this->AG_RENDER_EXTRA_DATA;
     }
 
-    /**
-     * @param string $itemscope
-     */
     public function set_itemscope($itemscope = "")
     {
         $this->ITEMSCOPE = $itemscope;
@@ -288,9 +175,6 @@ class html_twig
     public function set_social_meta_tags($data = array())
     {
         $this->SOCIAL_META_TAGS = array();
-        foreach ($this->SOCIAL_META_TAGS as $item) {
-
-        }
         $this->SOCIAL_META_TAGS_HTML = "";
 
         if (isset($data['google'])) {
@@ -424,9 +308,6 @@ class html_twig
         $this->AG_SEO_DATA['page_keyWords'] = cleanToPrint($keywords);
     }
 
-    /**
-     * @param $array_json
-     */
     public function render_json($array_json)
     {
         $this->done_render = true;
@@ -438,6 +319,7 @@ class html_twig
         } else {
             $json = $array_json;
         }
+
         // transform to acoutes to ut8
         echo($json);
     }
@@ -464,8 +346,6 @@ class html_twig
             'xeki_BASE_COMPLETE' => $AG_BASE_COMPLETE,
             'xeki_META_DATA' => $AG_META_DATA,
         );
-
-        $dataArray = [];
         $dataArray = array_merge($this->AG_SEO_DATA, $dataArray);
         $dataArray = array_merge($variables_system, $dataArray);
         $dataArray = array_merge($this->AG_RENDER_EXTRA_DATA, $dataArray);
@@ -476,8 +356,6 @@ class html_twig
         if ($this->SOCIAL_META_TAGS_HTML !== "") {
             $dataArray['page_social_meta_tags'] = $this->SOCIAL_META_TAGS_HTML;
         }
-
-        // Other tags
         // valid if file exist
         $file_base_path = $this->base_path;
         if (!file_exists("{$file_base_path}{$file}")) {
@@ -495,10 +373,6 @@ class html_twig
         echo $print_html;
     }
 
-    /**
-     * @param $output
-     * @return array|string|string[]|null
-     */
     public function compress_html($output)
     {
         return preg_replace(
@@ -508,12 +382,6 @@ class html_twig
         );
     }
 
-
-    // static methods
-
-    /**
-     * @return string
-     */
     public function get_url_base_complete()
     {
         return $this->AG_BASE_COMPLETE;

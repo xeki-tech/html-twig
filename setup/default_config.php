@@ -17,13 +17,11 @@ $MODULE_DATA_CONFIG = array(
 
         // folder
         "pages_folder"=>"core/pages",
-        "cache_folder"=>"cache/pages",
-
-        "cache_folder_yaml"=>"temp/cache/pages",
+        "cache_folder"=>sys_get_temp_dir()."/cache/pages/",
+        "cache_folder_yaml"=>sys_get_temp_dir()."/yaml/cache/pages/",
 
         // cache set true for production, if is true
         "cache"=>false,
-
     ),
 
 );
