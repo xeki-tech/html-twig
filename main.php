@@ -4,11 +4,8 @@ require_once dirname(__FILE__) . "/core/core.php";
 
 class main
 {
-    public static $sql = null;
+    public static $objectModule = null;
     public $config = array();
-    public $user = '';
-    public $pass = '';
-    public $db = '';
 
     function init($config)
     {
@@ -18,7 +15,7 @@ class main
 
     function getObject()
     {
-        if (self::$sql == null) {
+        if (self::$objectModule == null) {
 
             if(empty($this->config['pages_folder'])){
                 d("html-twig module page folder not setted");die();
@@ -31,9 +28,9 @@ class main
             $path_cache = \xeki\core::$SYSTEM_PATH_BASE.'/'.$this->config['cache_folder'];## this update by modules
             $this->config['pages_folder']=$path_html;
             $this->config['cache_folder']=$path_cache;
-            self::$sql = new html_twig( $this->config);
+            self::$objectModule = new html_twig( $this->config);
         }
-        return self::$sql;
+        return self::$objectModule;
     }
 
     function check()
