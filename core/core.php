@@ -1,7 +1,7 @@
 <?php
-namespace xeki_html_twig;
+namespace xeki_modules\html_twig;
 use Twig;
-class xeki_html_twig
+class html_twig
 {
     public $done_render = false;
     public $render = '';
